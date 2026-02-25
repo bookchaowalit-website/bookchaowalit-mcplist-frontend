@@ -1,25 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { MCP_SERVERS } from '@/lib/mcp-servers';
 
 // MCP Server implementation for Next.js API route
 // This acts as a proxy/aggregator to other MCP servers
 
 export const runtime = 'edge';
-
-interface MCPServer {
-  name: string;
-  url: string;
-  description: string;
-  tools?: string[];
-}
-
-const KNOWN_MCP_SERVERS: MCPServer[] = [
-  {
-    name: 'bookchaowalit',
-    url: 'https://bookchaowalit.com',
-    description: 'Personal blog and content platform',
-    tools: ['fetch_content', 'search_articles', 'get_post']
-  }
-];
 
 // Handle GET requests - return server info
 export async function GET() {
@@ -30,7 +15,7 @@ export async function GET() {
     endpoints: {
       mcp: '/api/mcp',
       documentation: '/',
-      servers: KNOWN_MCP_SERVERS.length
+      servers: MCP_SERVERS.length
     },
     usage: {
       method: 'POST',
@@ -49,13 +34,13 @@ export async function GET() {
 async function handleMCPRequest(request: NextRequest) {
   try {
     const body = await request.json();
-    const { method, params } = body;
+    const { method, params, id } = body;
 
     switch (method) {
       case 'initialize':
         return NextResponse.json({
           jsonrpc: '2.0',
-          id: body.id,
+          id: id,
           result: {
             protocolVersion: '2024-11-05',
             capabilities: {
@@ -71,15 +56,15 @@ async function handleMCPRequest(request: NextRequest) {
         });
 
       case 'tools/list':
-        const allTools = KNOWN_MCP_SERVERS.flatMap(server =>
+        const allTools = MCP_SERVERS.flatMap(server =>
           (server.tools || []).map(tool => ({
-            name: `${server.name}_${tool}`,
-            description: `${tool} from ${server.name}`,
-            inputSchema: {
+            name: `${server.id}_${tool.name}`,
+            description: `${tool.description} (${server.name})`,
+            inputSchema: tool.inputSchema || {
               type: 'object',
               properties: {
-                server: { type: 'string', const: server.name },
-                tool: { type: 'string', const: tool },
+                server: { type: 'string', const: server.id },
+                tool: { type: 'string', const: tool.name },
                 params: { type: 'object' }
               }
             }
@@ -88,22 +73,22 @@ async function handleMCPRequest(request: NextRequest) {
 
         return NextResponse.json({
           jsonrpc: '2.0',
-          id: body.id,
+          id: id,
           result: { tools: allTools }
         });
 
       case 'tools/call':
         const { name, arguments: toolArgs } = params;
-        const [serverName, toolName] = name.split('_');
+        const [serverId, toolName] = name.split('_');
 
-        const targetServer = KNOWN_MCP_SERVERS.find(s => s.name === serverName);
+        const targetServer = MCP_SERVERS.find(s => s.id === serverId);
         if (!targetServer) {
           return NextResponse.json({
             jsonrpc: '2.0',
-            id: body.id,
+            id: id,
             error: {
               code: -32601,
-              message: `Server ${serverName} not found`
+              message: `Server ${serverId} not found`
             }
           });
         }
@@ -114,7 +99,7 @@ async function handleMCPRequest(request: NextRequest) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             jsonrpc: '2.0',
-            id: body.id,
+            id: id,
             method: 'tools/call',
             params: { name: toolName, arguments: toolArgs }
           })
@@ -126,14 +111,19 @@ async function handleMCPRequest(request: NextRequest) {
       case 'servers/list':
         return NextResponse.json({
           jsonrpc: '2.0',
-          id: body.id,
-          result: { servers: KNOWN_MCP_SERVERS }
+          id: id,
+          result: { servers: MCP_SERVERS.map(s => ({
+            id: s.id,
+            name: s.name,
+            url: s.url,
+            description: s.description
+          })) }
         });
 
       default:
         return NextResponse.json({
           jsonrpc: '2.0',
-          id: body.id,
+          id: id,
           error: {
             code: -32601,
             message: 'Method not found'
