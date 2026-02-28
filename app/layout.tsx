@@ -34,6 +34,55 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}
       >
+  {/* Structured Data for SEO */}
+  <script
+    type="application/ld+json"
+    dangerouslySetInnerHTML={{
+      __html: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'WebApplication',
+        name: 'Mcplist',
+        url: 'https://bookchaowalit-mcplist.vercel.app',
+        description: 'Mcplist by Bookchaowalit - A modern web application',
+        applicationCategory: 'UtilitiesApplication',
+        operatingSystem: 'Web',
+        offers: {
+          '@type': 'Offer',
+          price: '0',
+          priceCurrency: 'USD'
+        },
+        author: {
+          '@type': 'Person',
+          name: 'Bookchaowalit',
+          url: 'https://bookchaowalit.com'
+        },
+        publisher: {
+          '@type': 'Organization',
+          name: 'Bookchaowalit',
+          url: 'https://bookchaowalit.com'
+        }
+      })
+    }}
+  />
+
+  <script
+    type="application/ld+json"
+    dangerouslySetInnerHTML={{
+      __html: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: 'Mcplist',
+        url: 'https://bookchaowalit-mcplist.vercel.app',
+        potentialAction: {
+          '@type': 'SearchAction',
+          target: 'https://bookchaowalit-mcplist.vercel.app/more-projects',
+          'query-input': 'required name=search_term'
+        }
+      })
+    }}
+  />
+
+
         {children}
       </body>
     </html>
