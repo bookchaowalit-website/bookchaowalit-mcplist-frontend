@@ -120,3 +120,9 @@ The project is pre-configured with `vercel.json` for optimal deployment.
 ## License
 
 MIT
+
+## Related
+
+- **Mobile App:** [bookchaowalit-mcplist-mobile](https://github.com/bookchaowalit-mobile/bookchaowalit-mcplist-mobile)
+- **Portfolio:** [bookchaowalit.com](https://bookchaowalit.com)
+
