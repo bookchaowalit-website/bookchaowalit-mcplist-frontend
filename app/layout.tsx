@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import { Analytics } from "@vercel/analytics/react"
-import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const inter = Inter({
   variable: "--font-inter",
@@ -36,6 +34,13 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}
       >
+        {/* THESIS: turn an MCP directory into a field atlas for deliberate discovery.
+OWN-WORLD: midnight navy, cyan orbit marks, coral annotations, and ruled server entries make protocol shape visible.
+STORY: search the registry, filter the field, open one server note, inspect its tools, then visit its declared URL.
+FIRST VIEWPORT: the discovery promise, registry count, search/filter controls, and first server rows are visible immediately.
+FORM: index rows, orbit diagrams, field notes, and tool registers replace a generic marketplace card grid.
+SEED: 1d51ce50 · assigned direction 4 · read mode.
+FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance */}
   {/* Structured Data for SEO */}
   <script
     type="application/ld+json"
@@ -83,10 +88,6 @@ export default function RootLayout({
       })
     }}
   />
-
-
-        <Analytics />
-        <SpeedInsights />
         {children}
       </body>
     </html>
